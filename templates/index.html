@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Go URL Shortener</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Welcome to Go URL Shortener</h1>
+
+  <div class="forms">
+    <form action="/login" method="post">
+      <h2>Log In</h2>
+      <input name="username" placeholder="Username" required>
+      <input name="password" type="password" placeholder="Password" required>
+      <button>Log In</button>
+    </form>
+
+    <form action="/signup" method="post">
+      <h2>Sign Up</h2>
+      <input name="username" placeholder="Choose a username" required>
+      <input name="password" type="password" placeholder="Choose a password" required>
+      <button>Sign Up</button>
+    </form>
+  </div>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Your Dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <h1>Your Links</h1>
+  <a href="/logout">Log out</a>
+
+  <section class="shorten-form">
+    <h2>Shorten a new URL</h2>
+    <form action="/shorten" method="post">
+      <input name="url" placeholder="https://example.com" required>
+      <input name="alias" placeholder="custom alias (optional)">
+      <input name="expires" type="date" placeholder="Expires on (optional)">
+      <button>Shorten</button>
+    </form>
+  </section>
+
+  <section class="links-list">
+    <table>
+      <tr><th>Short URL</th><th>Original</th><th>Clicks</th><th>Expires</th><th>Action</th></tr>
+      {{range .Links}}
+      <tr>
+        <td><a href="http://{{$.Host}}/r/{{.Code}}" target="_blank">{{.Code}}</a></td>
+        <td><a href="{{.Original}}" target="_blank">{{.Original}}</a></td>
+        <td>{{.ClickCount}}</td>
+        <td>{{if .ExpiresAt.Valid}}{{.ExpiresAt.Time.Format "2006-01-02"}}{{else}}—{{end}}</td>
+        <td>
+          <form action="/delete/{{.ID}}" method="post" style="display:inline">
+            <button>Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{end}}
+    </table>
+  </section>
+</body>
+</html>

@@ -1,0 +1,11 @@
+body { font-family: sans-serif; max-width: 800px; margin: 40px auto; }
+h1, h2 { color: #333; }
+.forms { display: flex; gap: 40px; }
+.forms form { border: 1px solid #ccc; padding: 20px; border-radius: 4px; }
+input { display: block; margin: 10px 0; padding: 8px; width: 100%; box-sizing: border-box; }
+button { padding: 8px 12px; }
+table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+th { background: #f4f4f4; }
+.shorten-form { margin-top: 30px; }
+.links-list { margin-top: 20px; }
