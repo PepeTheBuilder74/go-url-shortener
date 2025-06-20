@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"database/sql"
 	"fmt"
 	"html/template"
@@ -360,9 +361,22 @@ func shortenHandler(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
+		// ✅ AJAX response handling here
+		accept := r.Header.Get("Accept")
+		if strings.Contains(accept, "application/json") || r.Header.Get("X-Requested-With") == "XMLHttpRequest" {
+			w.Header().Set("Content-Type", "application/json")
+			shortURL := fmt.Sprintf("http://%s/r/%s", r.Host, code)
+			json.NewEncoder(w).Encode(map[string]string{
+				"short_url": shortURL,
+			})
+			return
+		}
+
+		// Fallback: normal redirect if not AJAX
 		http.Redirect(w, r, "/dashboard", http.StatusSeeOther)
 	}
 }
+
 
 func deleteHandler(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
