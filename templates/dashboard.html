@@ -1,35 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Your Dashboard</title>
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css" />
 </head>
+
 <body>
   <h1>Your Links</h1>
   <a href="/logout">Log out</a>
-
   <section class="shorten-form">
     <h2>Shorten a new URL</h2>
-    <form action="/shorten" method="post">
-      <input name="url" placeholder="https://example.com" required>
-      <input name="alias" placeholder="custom alias (optional)">
-      <input name="expires" type="date" placeholder="Expires on (optional)">
+    <form id="shorten-form" action="/shorten" method="post">
+      <input name="url" placeholder="https://example.com" required />
+      <input name="alias" placeholder="custom alias (optional)" />
+      <label for="expires">Expiry date</label>
+      <input id="expires" name="expires" type="date" placeholder="Expires on (optional)" />
       <button>Shorten</button>
     </form>
+    <div id="shorten-result" style="margin-top: 1em; display: none">
+      <strong>Short URL:</strong>
+      <a href="#" id="short-link" target="_blank"></a>
+      <button type="button" onclick="copyToClipboard()">Copy</button>
+    </div>
   </section>
 
   <section class="links-list">
     <table>
-      <tr><th>Short URL</th><th>Original</th><th>Clicks</th><th>Expires</th><th>Action</th></tr>
+      <tr>
+        <th>Short URL</th>
+        <th>Original</th>
+        <th>Clicks</th>
+        <th>Expires</th>
+        <th>Action</th>
+      </tr>
       {{range .Links}}
       <tr>
-        <td><a href="http://{{$.Host}}/r/{{.Code}}" target="_blank">{{.Code}}</a></td>
+        <td>
+          <a href="http://{{$.Host}}/r/{{.Code}}" target="_blank">{{.Code}}</a>
+        </td>
         <td><a href="{{.Original}}" target="_blank">{{.Original}}</a></td>
         <td>{{.ClickCount}}</td>
-        <td>{{if .ExpiresAt.Valid}}{{.ExpiresAt.Time.Format "2006-01-02"}}{{else}}—{{end}}</td>
         <td>
-          <form action="/delete/{{.ID}}" method="post" style="display:inline">
+          {{if .ExpiresAt.Valid}}{{.ExpiresAt.Time.Format
+          "2006-01-02"}}{{else}}—{{end}}
+        </td>
+        <td>
+          <form action="/delete/{{.ID}}" method="post" style="display: inline">
             <button>Delete</button>
           </form>
         </td>
@@ -37,5 +55,78 @@
       {{end}}
     </table>
   </section>
+  <script>
+    // Create or get the alert div below the shorten button
+    function getOrCreateAlertDiv() {
+      let alertDiv = document.getElementById("shorten-alert");
+      if (!alertDiv) {
+        alertDiv = document.createElement("div");
+        alertDiv.id = "shorten-alert";
+        alertDiv.style.marginTop = "0.5em";
+        alertDiv.style.color = "red";
+        const form = document.getElementById("shorten-form");
+        form.appendChild(alertDiv);
+      }
+      return alertDiv;
+    }
+
+    document
+      .getElementById("shorten-form")
+      .addEventListener("submit", async function (e) {
+        e.preventDefault(); // Prevent page reload
+
+        const form = e.target;
+        const formData = new FormData(form);
+        const alertDiv = getOrCreateAlertDiv();
+        alertDiv.textContent = ""; // Clear previous alerts
+
+        const response = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: {
+            "X-Requested-With": "XMLHttpRequest",
+            Accept: "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          alertDiv.textContent = "Failed to shorten URL. Maybe the alias is already used.";
+          return;
+        }
+
+        const data = await response.json();
+        const resultDiv = document.getElementById("shorten-result");
+        const shortLink = document.getElementById("short-link");
+
+        shortLink.href = data.short_url;
+        shortLink.textContent = data.short_url;
+        resultDiv.style.display = "block";
+
+        form.reset(); // Optional: clear form after success
+      });
+
+    function copyToClipboard() {
+      const link = document.getElementById("short-link").textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        let alertDiv = document.getElementById("shorten-alert");
+        if (!alertDiv) {
+          alertDiv = getOrCreateAlertDiv();
+        }
+        alertDiv.style.color = "green";
+        alertDiv.textContent = "Copied to clipboard!";
+        setTimeout(() => {
+          alertDiv.textContent = "";
+          alertDiv.style.color = "red";
+        }, 2000);
+      });
+    }
+  </script>
+  </script>
 </body>
+
 </html>
+<!--
+-made new links copyable and added alert div for copy confirmation
+-made the shorten form submit via AJAX to avoid page reload
+-made the shorten form handle errors and display messages without page reload 
+-->
