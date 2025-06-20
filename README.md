@@ -1,8 +1,3 @@
-# go-url-shortener
-✅ Save this as README.md in your project root:
-markdown
-Copy
-Edit
 # URL Shortener in Go
 
 A fully functional **URL shortener** built from scratch using **Golang** and **SQLite**. Users can sign up, log in, shorten URLs (with optional custom aliases and expiry dates), and track click analytics. Ideal for learning full-stack backend development and showcasing skills in building real-world web applications.
